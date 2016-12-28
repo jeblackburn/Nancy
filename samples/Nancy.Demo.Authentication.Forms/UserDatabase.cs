@@ -20,11 +20,26 @@ namespace Nancy.Demo.Authentication.Forms
 
         public ClaimsPrincipal GetUserFromIdentifier(Guid identifier, NancyContext context)
         {
-            var userRecord = users.FirstOrDefault(u => u.Item3 == identifier);
+            try
+            {
+                var userRecord = users.FirstOrDefault(u => u.Item3 == identifier);
 
-            return userRecord == null
-                       ? null
-                       : new ClaimsPrincipal(new GenericIdentity(userRecord.Item1));
+                if (userRecord == null)
+                    return null;
+
+                var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userRecord.Item1) };
+                if (userRecord.Item1 == "admin")
+                {
+                    claims.Add(new Claim(ClaimTypes.GroupSid, "administrators"));
+                }
+                var cid = new ClaimsIdentity(claims);
+                return new ClaimsPrincipal(cid);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
 
         public static Guid? ValidateUser(string username, string password)
