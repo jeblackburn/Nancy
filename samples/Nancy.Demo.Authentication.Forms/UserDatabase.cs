@@ -27,12 +27,12 @@ namespace Nancy.Demo.Authentication.Forms
                 if (userRecord == null)
                     return null;
 
-                var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userRecord.Item1) };
+                var claims = new List<Claim> { new Claim(ClaimTypes.Name, userRecord.Item1) };
                 if (userRecord.Item1 == "admin")
                 {
                     claims.Add(new Claim(ClaimTypes.GroupSid, "administrators"));
                 }
-                var cid = new ClaimsIdentity(claims);
+                var cid = new ClaimsIdentity(claims, "password", ClaimTypes.Name, null);
                 return new ClaimsPrincipal(cid);
             }
             catch (Exception e)
